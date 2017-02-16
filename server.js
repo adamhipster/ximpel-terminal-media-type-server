@@ -13,20 +13,20 @@ io.on('connection', function(client){
 
 
   sh.stdout.on('data', function(data) {
-    io.emit('message', data);
+    client.emit('message', data);
   });
 
   sh.stderr.on('data', function(data) {
-    io.emit('message', data);
+    client.emit('message', data);
   });
 
   sh.on('exit', function (code) {
-    io.emit('exit', '** Shell exited: '+code+' **');
+    client.emit('exit', '** Shell exited: '+code+' **');
   });
 
   client.on('message', function(data){
     sh.stdin.write(data+"\n");
-    io.emit('message', new Buffer("> "+data));
+    client.emit('cmd_message', new Buffer("> "+data));
   });
 
   client.on('disconnect', function(){
