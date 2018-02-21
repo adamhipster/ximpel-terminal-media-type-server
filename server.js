@@ -35,6 +35,6 @@ io.on('connection', function(client){
   })
 });
 
-server.listen(8080, function(){
+server.listen(process.argv[2] || 8080, function(){
   console.log('server started');
 })

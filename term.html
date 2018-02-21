@@ -1,73 +1,92 @@
 <!doctype html>
 <html>
-  <head>
-    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" charset="utf-8">
-      var socket = io('http://localhost:8080')
-      
-      function add_content(bashOutput){
-        $('div').append('<p>' + bashOutput + '</p>');
-        var scrolledWindow = $('body').height() - $(window).height() + 80
-        $(window).scrollTop(scrolledWindow);
-      }
-      
-      //socket io listeners
-      socket.on('connect',function() {
-        console.log('Client has connected to the server!');
-      });
-      
-      socket.on('exit', function(data){
-        add_content(data);
-      })
-      
-      socket.on('message', function(data) {
-        var buf = String.fromCharCode.apply(null, new Uint8Array(data));
-        add_content(buf);
-      });
-      
-      //jquery form and page handling
-      $(document).ready(function(){
-        $('form').submit(function(event){
-          var input = $('input');
-          socket.send(input.val());
+	<head>
+		<link rel="stylesheet" type="text/css" href="cssConsole.css">
+		<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="cssConsole.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			var socket = io('http://localhost:8080')
+			
+			function add_content(bashOutput){
+				$('div').append('<p>' + bashOutput + '</p>');
+				var scrolledWindow = $('body').height() - $(window).height() + 80
+				$(window).scrollTop(scrolledWindow);
+			}
+			
+			//socket io listeners
+			socket.on('connect',function() {
+				console.log('Client has connected to the server!');
+			});
+			
+			socket.on('exit', function(data){
+				add_content(data);
+			})
+			
+			socket.on('message', function(data) {
+				var buf = String.fromCharCode.apply(null, new Uint8Array(data));
+				add_content(buf);
+			});
 
-          //clean the prompt
-          input.val(''); 
+			socket.on('cmd_message', function(data) {
+				var buf = String.fromCharCode.apply(null, new Uint8Array(data));
+				add_content(buf);
+			});
+			
+			//jquery form and page handling
+			$(document).ready(function(){
+				$('form').submit(function(event){
+					var input = $('input');
+					socket.send(input.val());
 
-          //leave the content on the page
-          return false;
-        });
+					//clean the prompt
+					input.val(''); 
 
-        //let a cursor focus on the input when the page is loaded
-        $('input').focus();
-      });
-    </script> 
+					//leave the content on the page
+					return false;
+				});
 
-    <style type="text/css">
-      body, p, input {
-        font-family: fixed;
-        font-size: 13px;
-        border: none;
-      }
-      p { 
-        white-space: pre; 
-      }
-      p, form, input { 
-        margin:0; padding:0; 
-      }
-      input:focus { 
-        outline: none; 
-        border: none; 
-      }
-    </style>
-  </head>
+				//let a cursor focus on the input when the page is loaded
+				$('input').focus();
 
-  <body>
-    <div></div>
-    <form>
-      &gt; <input>
-    </form>
-  </body>
+				//css console
+				$('input').cssConsole({
+					preventEnter: false,
+					onEnter: function(){
+						alert('hey')
+					}
+				});
+			});
+		</script> 
+
+		<style type="text/css">
+			body, p, input {
+				font-family: helvetica, sans-serif, arial;
+				font-size: 13px;
+				border: none;
+				color: white;
+				background-color: #111;
+			}
+
+			p { 
+				color: white;
+				white-space: pre; 
+			}
+			p, form, input { 
+				margin:0; padding:0; 
+			}
+			input:focus { 
+				outline: none; 
+				border: none; 
+			}
+		</style>
+	</head>
+
+	<body>
+		<div></div>
+		<form>
+			&gt; <input>
+		</form>
+	</body>
 
 </html>
